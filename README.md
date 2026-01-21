@@ -1,57 +1,41 @@
-# Event-Based Camera Visualizer
+# Motion Analysis in Neuromorphic Cameras
 
-A Python-based visualization tool for event camera data streams, designed to process and animate neuromorphic vision sensor outputs.
+The code implementations of the system discussed in our project report, covering pose estimation, action classifiaction and privacy preservation in neuromorphic cameras.
 
-## Overview
 
-This project processes event data from event-based cameras (tested with N-MNIST dataset) and creates animated visualizations showing temporal event accumulation. Event cameras capture per-pixel brightness changes asynchronously, producing sparse event streams instead of traditional frames.
+## Modules
 
-## Example Output
+Each module mentioned in the report is contained within a standalone folder:
+- action_classifier: Code and models related to pose estimation, action classifiactio and skeletal structure visualization.
+- app: Web interface that simplifies the usage of select modules (e.g. V2E for custom event-stream video creation and face-detection and blurring).
+- face_detection: Code used to conduct the face detection and shuffling experiment (Split from the Facial_Detection_and_Blurring_Events.ipynb file into logical subsections in .py format).  
 
-![Event Animation](event_animation.gif)
 
-## Features
-
-- **Adaptive Frame Generation**: Automatically calculates optimal events per frame based on event rate
-- **Configurable Intervals**: Adjust temporal grouping (default: 50ms intervals)
-- **Privacy Preservation**: Optional shuffling of events within chunks or frame reordering
-- **Polarity Visualization**: Color-coded display of positive/negative events (red/blue)
-- **GIF Export**: Generates animated visualizations for analysis
 
 ## Requirements
 
 ```bash
-pip install numpy matplotlib
+python3 -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+chmod +x ./install_st-gcn.sh
+chmod +x ./install_v2e.sh
+./install_st-gcn.sh
+./install_v2e.sh
 ```
+
 
 ## Usage
 
-1. Place your event data in `events.txt` (format: timestamp, x, y, polarity)
-2. Run the visualizer:
+For the web interface:
 ```bash
-python visualizer.py
+python app/app.py
 ```
 
-The script will:
-- Load and process event data
-- Calculate optimal chunk sizes based on event rate
-- Generate frames (240×180 resolution)
-- Create `event_animation.gif` output
-- Display interactive animation
-
-## Configuration
-
-Edit variables in `visualizer.py`:
-- `interval`: Time window in milliseconds (default: 50)
-- `width`, `height`: Output resolution (default: 240×180)
-- Uncomment shuffle functions for privacy-preserving mode
-
-## Data Format
-
-Input file should contain one event per line:
+For action classification:
+```bash
+classify_action.py
 ```
-timestamp x_coordinate y_coordinate polarity
-```
-- Timestamp: microseconds or seconds
-- Coordinates: integer pixel positions
-- Polarity: 1 (brightness increase) or 0/-1 (brightness decrease)
+
+For face detection you can load the python notebook file into [google colab](https://colab.research.google.com/) and use the T4 GPU to run each cell.
+

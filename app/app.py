@@ -116,27 +116,23 @@ def api_v2e():
 
     name, _ = os.path.splitext(file.filename)
     output_path = os.path.join(PROCESSED_FOLDER, f"{name}_events.npy")
+    script_dir = os.path.dirname(os.path.abspath(__file__))  # folder of this script
+    v2e_path = os.path.join(script_dir, "..", "v2e", "v2e.py")
+    v2e_path = os.path.abspath(v2e_path)  
 
     cmd = [
         "python3",
-        V2E_PATH,
-        "--input", input_path,
-        "--output", output_path
+        v2e_path,
+        input_path
     ]
-
     try:
         subprocess.run(cmd, check=True)
     except subprocess.CalledProcessError as e:
-        return jsonify({
-            "error": "v2e failed",
-            "details": str(e)
-        }), 500
+        print("Return code:", e.returncode)
+        print("Output:", e.output)
 
-    return send_file(
-        output_path,
-        as_attachment=True,
-        download_name=os.path.basename(output_path)
-    )
+    return "", 200
+
 
 @app.route("/api/data-labeling", methods=["POST"])
 def api_labeling():

@@ -1,0 +1,173 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    background-color: #f5f5f5;
+    line-height: 1.6;
+}
+header {
+    background-color: white;
+    border-bottom: 1px solid #e0e0e0;
+    padding: 2rem 1rem;
+}
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 1rem;
+}
+h1 {
+    font-size: 2rem;
+    color: #333;
+    margin-bottom: 0.5rem;
+}
+.subtitle {
+    color: #666;
+    font-size: 0.95rem;
+}
+main {
+    padding: 2rem 0;
+}
+.tabs {
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+.tab-list {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    border-bottom: 1px solid #e0e0e0;
+    background-color: #fafafa;
+    border-radius: 8px 8px 0 0;
+}
+.tab-button {
+    padding: 1rem;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 0.95rem;
+    color: #666;
+    transition: all 0.2s;
+    border-bottom: 2px solid transparent;
+}
+.tab-button:hover {
+    background-color: #f0f0f0;
+    color: #333;
+}
+.tab-button.active {
+    color: #2563eb;
+    border-bottom-color: #2563eb;
+    background-color: white;
+}
+.tab-content {
+    display: none;
+    padding: 2rem;
+}
+.tab-content.active {
+    display: block;
+}
+.card {
+    background-color: white;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 2rem;
+    max-width: 800px;
+    margin: 0 auto;
+}
+.card-title {
+    font-size: 1.5rem;
+    color: #333;
+    margin-bottom: 1rem;
+}
+.card-description {
+    color: #666;
+    margin-bottom: 2rem;
+    line-height: 1.7;
+}
+.upload-section {
+    margin-top: 1.5rem;
+}
+label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+    color: #333;
+}
+.file-input-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+input {
+    flex: 1;
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #d0d0d0;
+    border-radius: 6px;
+    font-size: 0.95rem;
+    box-sizing: border-box;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+input:focus {
+    border-color: #2563eb;
+    box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2);
+}
+
+
+.upload-icon {
+    width: 24px;
+    height: 24px;
+    color: #666;
+}
+.file-name {
+    margin-top: 0.75rem;
+    font-size: 0.9rem;
+    color: #666;
+}
+.file-name span {
+    font-weight: 500;
+    color: #333;
+}
+
+.make-wide {
+    width: 100%;
+}
+
+button {
+    width: 100%;
+    padding: 0.75rem;
+    border-radius: 6px;
+    border: 1px solid #d0d0d0;
+    background-color: #4077ef;
+    color: white;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: background-color 0.2s, border-color 0.2s;
+}
+
+button:hover {
+    background-color: #7191e9;
+    border-color: #606ea4;
+}
+
+@media (max-width: 768px) {
+    .tab-list {
+        grid-template-columns: repeat(3, 1fr);
+    }
+    .tab-button {
+        padding: 0.75rem 0.5rem;
+        font-size: 0.85rem;
+    }
+    h1 {
+        font-size: 1.5rem;
+    }
+}
+@media (max-width: 480px) {
+    .tab-list {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}

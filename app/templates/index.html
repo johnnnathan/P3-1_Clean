@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Event Privacy Project</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script defer src="{{ url_for('static', filename='script.js') }}"></script>
+</head>
+
+<body>
+    <header>
+        <div class="container">
+            <h1>Event Privacy Project</h1>
+            <p class="subtitle">Upload event files to process them with various privacy-preserving transformations</p>
+        </div>
+    </header>
+
+    <main>
+        <div class="container">
+            <div class="tabs">
+                <div class="tab-list">
+                    <button class="tab-button active" data-tab="event-tab">Event Shuffle</button>
+                    <button class="tab-button" data-tab="frame-tab">Frame Shuffle</button>
+                    <button class="tab-button" data-tab="blur-tab">Frame Blur</button>
+                    <button class="tab-button" data-tab="visual-tab">Visualization</button>
+                    <button class="tab-button" data-tab="v2e-tab">V2E</button>
+                    <button class="tab-button" data-tab="labeling-tab">Data Labeling</button>
+                </div>
+
+                <!-- Event Shuffle -->
+                <div class="tab-content active" id="event-tab">
+                    <div class="card">
+                        <h3>Event Shuffle</h3>
+                        <p>Randomly reorders events within each interval to preserve privacy.</p>
+                        <form action="/api/event_shuffle" method="post" enctype="multipart/form-data">
+                            <label>Select event file:</label>
+                            <input type="file" name="file" required>
+
+                            <label>Interval (ms):</label>
+                            <input type="number" name="interval" value="50" step="10" min="10" max="500">
+
+                            <button type="submit">Run Event Shuffle</button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Frame Shuffle -->
+                <div class="tab-content" id="frame-tab">
+                    <div class="card">
+                        <h3>Frame Shuffle</h3>
+                        <p>Randomizes the order of entire frames while preserving local structure.</p>
+                        <form action="/api/frame_shuffle" method="post" enctype="multipart/form-data">
+                            <label>Select event file:</label>
+                            <input type="file" name="file" required>
+                            <button type="submit">Run Frame Shuffle</button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Frame Blur -->
+                <div class="tab-content" id="blur-tab">
+                    <div class="card">
+                        <h3>Frame Blur</h3>
+                        <p>Applies Gaussian blur to frames. Larger σ = stronger smoothing.</p>
+                        <form action="/api/frame_blur" method="post" enctype="multipart/form-data">
+                            <label>Select event file:</label>
+                            <input type="file" name="file" required>
+
+                            <label>Blur strength (σ):</label>
+                            <input type="number" name="sigma" value="1.5" step="0.1" min="0.5" max="5">
+
+                            <button type="submit">Run Frame Blur</button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Visualization -->
+                <div class="tab-content" id="visual-tab">
+                    <div class="card">
+                        <h3>Visualization</h3>
+                        <p>Visualized the event data into a video format.</p>
+                        <form id="visual-form" method="POST" enctype="multipart/form-data">
+                            <label>Select event file:</label>
+                            <input class="make-wide" type="file" name="file" required>
+
+                            <label>Interval (ms):</label>
+                            <input class="make-wide" type="number" name="interval" value="50" step="10" min="10" max="500">
+
+                            <button type="submit">Generate Visualization</button>
+                        </form>
+
+                        <div id="visual-output">
+                            <a id="download-btn" href="#" download>Download GIF</a>
+                            <img id="visual-gif" src="" alt="">
+                        </div>
+                    </div>
+                </div>
+                <!-- V2E -->
+                <div class="tab-content" id="v2e-tab">
+                    <div class="card">
+                        <h3>Video-2-Event</h3>
+                        <p>Convers the video data into event data.</p>
+                        <form action="/api/v2e" method="POST" enctype="multipart/form-data">
+                            <label>Select mp4 file:</label>
+                            <input class="make-wide" type="file" name="file" required>
+
+                            <button type="submit">Generate Events</button>
+                        </form>
+
+                    </div>
+                </div>
+
+                <!-- Data Labeling -->
+                <div class="tab-content" id="labeling-tab">
+                    <div class="card">
+                        <h3>Data Labeling</h3>
+                        <p>Labels event data with pose classification model.</p>
+                        <form action="/api/data-labeling" method="POST" enctype="multipart/form-data">
+                            <label>Select event file:</label>
+                            <input class="make-wide" type="file" name="file" required>
+
+                            <button type="submit">Generate Data Labeling</button>
+                        </form>
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </main>
+</body>

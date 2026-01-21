@@ -2,6 +2,7 @@
 
 The code implementations of the system discussed in our project report, covering pose estimation, action classifiaction and privacy preservation in neuromorphic cameras.
 
+![event_gif](./event_animation.gif)
 
 ## Modules
 

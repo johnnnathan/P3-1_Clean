@@ -4,6 +4,7 @@ import numpy as np
 import io
 import base64
 from PIL import Image
+from ultralytics import YOLO
 
 # Import algorithms
 from algorithms.event_shuffle import event_shuffle
@@ -14,6 +15,10 @@ from algorithms.utils import make_frame_for_interval, create_frames, save_animat
 from algorithms.events2frame import events_to_frame
 from algorithms.facedetect import detect_faces_in_frame, blur_faces_in_frame
 from algorithms.labeler import predict_with_model
+from algorithms.face_blur import anonymize_media
+
+
+
 
 app = Flask(__name__)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))  # Project root
@@ -21,6 +26,15 @@ UPLOAD_FOLDER = os.path.join(BASE_DIR, "uploads")
 PROCESSED_FOLDER = os.path.join(BASE_DIR, "processed")
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 os.makedirs(PROCESSED_FOLDER, exist_ok=True)
+
+
+# SETUP MODEL
+MODEL_PATH = os.path.join(BASE_DIR, "models", "yolov8n-face.pt")
+
+if not os.path.exists(MODEL_PATH):
+    raise FileNotFoundError(f"Face model not found at {MODEL_PATH}")
+
+face_model = YOLO(MODEL_PATH)
 
 # ----------------------------------------------------------
 # FRONTEND PAGE
@@ -93,8 +107,36 @@ def api_visualize():
 
 @app.route("/api/v2e", methods=["POST"])
 def api_v2e():
-    print("Run v2e function")
-    return "This feature has not been implemented yet."
+    if "file" not in request.files:
+        return jsonify({"error": "No file provided"}), 400
+
+    file = request.files["file"]
+    input_path = os.path.join(UPLOAD_FOLDER, file.filename)
+    file.save(input_path)
+
+    name, _ = os.path.splitext(file.filename)
+    output_path = os.path.join(PROCESSED_FOLDER, f"{name}_events.npy")
+
+    cmd = [
+        "python3",
+        V2E_PATH,
+        "--input", input_path,
+        "--output", output_path
+    ]
+
+    try:
+        subprocess.run(cmd, check=True)
+    except subprocess.CalledProcessError as e:
+        return jsonify({
+            "error": "v2e failed",
+            "details": str(e)
+        }), 500
+
+    return send_file(
+        output_path,
+        as_attachment=True,
+        download_name=os.path.basename(output_path)
+    )
 
 @app.route("/api/data-labeling", methods=["POST"])
 def api_labeling():
@@ -147,6 +189,81 @@ def api_process_events():
         "faces": faces,
         "label": label
     })
+
+@app.route("/api/face_blur", methods=["POST"])
+def api_anonymize_media():
+    if "file" not in request.files:
+        return jsonify({"error": "No file provided"}), 400
+
+    file = request.files["file"]
+    blur_pct = int(request.form.get("blur_pct", 50))
+
+    input_path = os.path.join(UPLOAD_FOLDER, file.filename)
+    file.save(input_path)
+
+    name, ext = os.path.splitext(file.filename)
+    output_name = f"{name}_anonymized{ext}"
+    metadata_name = f"{name}_anonymized_metadata.json"
+
+    output_path = os.path.join(PROCESSED_FOLDER, output_name)
+    metadata_path = os.path.join(PROCESSED_FOLDER, metadata_name)
+
+    anonymize_media(
+        input_path=input_path,
+        output_path=output_path,
+        face_model=face_model,
+        blur_pct=blur_pct,
+        metadata_path=metadata_path
+    )
+
+    # 🔑 THIS forces a download
+    return send_file(
+        output_path,
+        as_attachment=True,
+        download_name=output_name
+    )
+
+import subprocess
+from flask import Flask, request, send_file, jsonify
+import os
+
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+UPLOAD_FOLDER = os.path.join(BASE_DIR, "uploads")
+PROCESSED_FOLDER = os.path.join(BASE_DIR, "processed")
+MOTIONBERT_SCRIPT = os.path.join(BASE_DIR, "MotionBERT/run_inference.py")
+
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+os.makedirs(PROCESSED_FOLDER, exist_ok=True)
+
+@app.route("/api/action-scoring", methods=["POST"])
+def api_action_scoring():
+    if "file" not in request.files:
+        return jsonify({"error": "No file provided"}), 400
+
+    file = request.files["file"]
+    input_path = os.path.join(UPLOAD_FOLDER, file.filename)
+    file.save(input_path)
+
+    output_name = os.path.splitext(file.filename)[0] + "_action.json"
+    output_path = os.path.join(PROCESSED_FOLDER, output_name)
+
+    cmd = [
+        "python3",
+        MOTIONBERT_SCRIPT,
+        "--input", input_path,
+        "--output", output_path
+    ]
+
+    try:
+        subprocess.run(cmd, check=True)
+    except subprocess.CalledProcessError as e:
+        return jsonify({"error": "Action scoring failed", "details": str(e)}), 500
+
+    return send_file(
+        output_path,
+        as_attachment=True,
+        download_name=output_name
+    )
 
 
 if __name__ == "__main__":
